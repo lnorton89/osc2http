@@ -1,5 +1,5 @@
 {
-  "config": { "name": "OSC2HTTP", "enabled": true, "port": 7001 },
+  "config": { "name": "OSC2HTTP", "enabled": true, "port": "7001" },
   "endpoints": [
     {
       "id": 0,

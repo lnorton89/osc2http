@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
-import AppBar from "@material-ui/core/AppBar";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import TextField from "@material-ui/core/TextField";
-import FormGroup from "@material-ui/core/FormGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
-import { CircularProgress } from "@material-ui/core";
+import {
+  AppBar,
+  CssBaseline,
+  Toolbar,
+  Typography,
+  Container,
+  TextField,
+  FormGroup,
+  FormControlLabel,
+  Switch,
+  CircularProgress,
+} from "@material-ui/core";
 import List from "./components/List";
 
 const useStyles = makeStyles((theme) => ({
@@ -28,8 +30,8 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(8),
   },
   footer: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(2),
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing(1),
   },
 }));
 
@@ -128,7 +130,7 @@ export default function App() {
                 paragraph
               >
                 This is your output port from Resolume Arena. Default is{" "}
-                <code>7001</code>. 
+                <code>7001</code>.
                 <br />
                 <i>Changing this requires restart of listen server!</i>
               </Typography>

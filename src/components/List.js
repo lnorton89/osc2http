@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { TextField, Checkbox, CircularProgress } from "@material-ui/core";
 import MaterialTable from "material-table";
-import { CircularProgress } from "@material-ui/core";
-import { TextField } from "@material-ui/core";
 import {
   AddBox,
   ArrowDownward,
@@ -102,10 +101,44 @@ export default function List() {
   const [isLoading, setIsLoaded] = useState(false);
   const [validationError, setValidationError] = useState(false);
   const [data, setData] = useState([]);
+  const [state, setState] = useState({});
   const tableRef = React.useRef(null);
 
+  const handleChange = (event) => {
+    let value =
+      event.target.type === "checkbox"
+        ? event.target.checked
+        : event.target.value;
+
+    function setData(target, value, id) {
+      return fetch(`/api/endpoint/update/${id}`, {
+        method: "POST",
+        body: JSON.stringify({
+          id: id,
+          [target]: value,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then(
+          (result) => {
+            console.log(result);
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+    }
+
+    setData(event.target.name, value, Number(event.target.id)).then(() => {
+      setState({ ...state, [event.target.name]: value });
+    });
+  };
+
   const columns = [
-    { field: "id", title: "ID", editable: "never", width: "5%" },
+    { field: "id", title: "ID", editable: "never", width: "5%", defaultSort: "asc" },
     {
       field: "name",
       title: "Name",
@@ -137,7 +170,18 @@ export default function List() {
     {
       field: "enabled",
       title: "Enabled",
+      editable: "never",
       width: "5%",
+      render: (rowData) => (
+        <Checkbox
+          name="enabled"
+          id={String(rowData.id)}
+          defaultChecked={rowData.enabled}
+          value={state.enabled}
+          onChange={handleChange}
+        />
+      ),
+
       // editComponent: (props) => {
       //   return (
       //     <TextField
@@ -161,9 +205,9 @@ export default function List() {
     filtering: false,
     padding: "dense",
     selection: false,
-    pageSize: 25,
+    pageSize: 10,
     actionsColumnIndex: -1,
-    pageSizeOptions: [25, 50, 100],
+    pageSizeOptions: [10, 50, 100],
     rowStyle: (rowData, index) => {
       if (index % 2) {
         return { backgroundColor: theme.palette.background.default };
@@ -183,9 +227,6 @@ export default function List() {
           setIsLoaded(true);
           setData(result);
         },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
         (error) => {
           setIsLoaded(true);
           setError(error);
@@ -215,40 +256,84 @@ export default function List() {
           onBulkUpdate: (changes) =>
             new Promise((resolve, reject) => {
               setTimeout(() => {
-                console.log(changes);
-                resolve();
-                // fetch("/api/endpoints/update", {
-                //   method: "POST",
-                //   body: JSON.stringify(changes),
-                //   headers: {
-                //     "Content-Type": "application/json",
-                //   },
-                // })
-                //   .then((res) => res.json())
-                //   .then(
-                //     (result) => {
-                //       console.log(result);
-                //       resolve();
-                //     },
-                //     // Note: it's important to handle errors here
-                //     // instead of a catch() block so that we don't swallow
-                //     // exceptions from actual bugs in components.
-                //     (error) => {
-                //       console.log(error);
-                //     }
-                //   );
+                let newData = [];
+
+                for (const key of Object.keys(changes)) {
+                  let mergedData = {
+                    ...changes[key].oldData,
+                    ...changes[key].newData,
+                  };
+                  data.splice(
+                    data.findIndex(function (i) {
+                      return i.id === changes[key].oldData.id;
+                    }),
+                    1
+                  );
+                  newData.push(mergedData);
+                }
+
+                for (const key of Object.keys(data)) {
+                  newData.push(data[key]);
+                }
+
+                console.log(newData);
+                setData(newData);
+                fetch("/api/endpoints/update", {
+                  method: "POST",
+                  body: JSON.stringify(
+                    newData.map(({ tableData, ...rest }) => rest)
+                  ),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                  .then((res) => res.json())
+                  .then(
+                    (result) => {
+                      console.log(result.response);
+                      resolve();
+                    },
+                    (error) => {
+                      console.log(error);
+                      reject();
+                    }
+                  );
               }, 500);
             }),
           onRowAdd: (newData) =>
             new Promise((resolve, reject) => {
               setTimeout(() => {
-                let dataSend = newData.map(({ tableData, ...rest }) => rest);
-                console.log(dataSend)
-                //setData([...data, newData]);
                 // need to reach out to backend and get reponse with ID and to resolve promise
                 // check here or server side for ID collison/new ID#?
-                console.log(newData);
-                resolve();
+                fetch("/api/endpoint/add", {
+                  method: "POST",
+                  body: JSON.stringify({
+                    ...newData,
+                  }),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                  .then((res) => res.json())
+                  .then(
+                    (result) => {
+                      console.log();
+                      newData = {
+                        ...newData,
+                        enabled: true,
+                        id:
+                          result[
+                            result.findIndex((p) => p.name == newData.name)
+                          ].id,
+                      };
+                      setData([...data, newData]);
+                      resolve();
+                    },
+                    (error) => {
+                      console.log(error);
+                      reject();
+                    }
+                  );
               }, 500);
             }),
           onRowUpdate: (newData, oldData) =>
@@ -269,14 +354,12 @@ export default function List() {
                   .then((res) => res.json())
                   .then(
                     (result) => {
-                      console.log(result);
+                      console.log(result.response);
                       resolve();
                     },
-                    // Note: it's important to handle errors here
-                    // instead of a catch() block so that we don't swallow
-                    // exceptions from actual bugs in components.
                     (error) => {
                       console.log(error);
+                      reject();
                     }
                   );
               }, 500);
@@ -288,7 +371,7 @@ export default function List() {
                 const index = oldData.tableData.id;
                 dataDelete.splice(index, 1);
                 setData([...dataDelete]);
-                fetch(`/api/endpoints/delete/${oldData.id}`, {
+                fetch(`/api/endpoint/delete/${oldData.id}`, {
                   method: "POST",
                 })
                   .then((res) => res.json())
@@ -297,15 +380,11 @@ export default function List() {
                       console.log(result);
                       resolve();
                     },
-                    // Note: it's important to handle errors here
-                    // instead of a catch() block so that we don't swallow
-                    // exceptions from actual bugs in components.
                     (error) => {
                       console.log(error);
+                      reject();
                     }
                   );
-
-                resolve();
               }, 500);
             }),
         }}

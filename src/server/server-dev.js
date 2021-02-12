@@ -13,7 +13,10 @@ import fetch from "node-fetch";
 var db = new Database();
 
 var oscServer = new Server(Number(appConfig.config.port), "0.0.0.0", () => {
-  console.log("OSC Server is listening on port: ", Number(appConfig.config.port));
+  console.log(
+    "OSC Server is listening on port: ",
+    Number(appConfig.config.port)
+  );
 });
 
 oscServer.on("message", function (msg) {
@@ -136,7 +139,7 @@ router.get("/endpoints", (req, res) => {
 
 // Update config status
 router.post("/status/update", (req, res) => {
-  console.log("status update: ", req.body)
+  console.log("status update: ", req.body);
   let currentConfig;
   db.get("config", function (err, result) {
     if (err) {
@@ -158,18 +161,18 @@ router.post("/status/update", (req, res) => {
   });
 });
 
-// Update all endpoints
+// Update all endpoints (This is used by update single and updateall on front end)
 router.post("/endpoints/update", (req, res) => {
   db.add("endpoints", req.body);
   let response = "Endpoints updated!";
-
+  console.log(req.body);
   res.set("content-type", "application/json");
   res.send({ response });
   res.end();
 });
 
 // Add new endpoint and generate ID after previous
-router.post("/endpoints/add", (req, res) => {
+router.post("/endpoint/add", (req, res) => {
   db.get("endpoints", function (err, result) {
     if (err) {
       console.log(err);
@@ -191,16 +194,16 @@ router.post("/endpoints/add", (req, res) => {
         };
         result.push(response);
         db.add("endpoints", result);
+        res.set("content-type", "application/json");
+        res.send(result);
+        res.end();
       }
-      res.set("content-type", "application/json");
-      res.send({ response });
-      res.end();
     }
   });
 });
 
 // Delete endpoint by ID
-router.post("/endpoints/delete/:endpoint_id", (req, res) => {
+router.post("/endpoint/delete/:endpoint_id", (req, res) => {
   db.get("endpoints", function (err, result) {
     if (err) {
       console.log(err);
@@ -212,6 +215,28 @@ router.post("/endpoints/delete/:endpoint_id", (req, res) => {
       else {
         result.splice(index, 1);
         response = "Deleted";
+        db.add("endpoints", result);
+      }
+      res.set("content-type", "application/json");
+      res.send({ response });
+      res.end();
+    }
+  });
+});
+
+// Edit endpoint by ID
+router.post("/endpoint/update/:endpoint_id", (req, res) => {
+  db.get("endpoints", function (err, result) {
+    if (err) {
+      console.log(err);
+    } else {
+      let response;
+      var index = result.findIndex((p) => p.id == req.params.endpoint_id);
+
+      if (index < 0) response = "Error";
+      else {
+        result[index].enabled = !result[index].enabled;
+        response = `Endpoint ${req.params.endpoint_id} state changed!`;
         db.add("endpoints", result);
       }
       res.set("content-type", "application/json");
