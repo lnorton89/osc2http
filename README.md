@@ -5,6 +5,7 @@ Express / React application to listen and convert OSC messages to interact with 
 All the data is stored in data.json in the root folder. If you would like to export/import data you can do so there. Currently the output sends a `POST` request to `http://IP.ADDRESS/json/state` with the item WLED preset. See [WLED Wiki](https://github.com/Aircoookie/WLED/wiki/JSON-API "WLED Wiki") for more information.
 
 ## Installation & Usage
+You must have [Node.js/npm](https://github.com/nodejs/node) installed to use this! 
 
     git clone https://github.com/lnorton89/osc2http.git
     cd osc2http
