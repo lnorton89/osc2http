@@ -1,7 +1,7 @@
 {
   "name": "osc2http",
   "version": "1.0.0",
-  "description": "Express / React application to listen and convert OSC messages to interact with an HTTP/JSON API.",
+  "description": "Express / React application to listen and convert OSC messages to interact with an HTTP API.",
   "main": "index.js",
   "scripts": {
     "test": "jest",
