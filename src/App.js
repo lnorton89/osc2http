@@ -12,7 +12,9 @@ import {
   Switch,
   CircularProgress,
 } from "@material-ui/core";
+import CodeTwoToneIcon from "@material-ui/icons/CodeTwoTone";
 import List from "./components/List";
+import { Block } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   preloader: {
@@ -33,6 +35,11 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(1),
   },
+  icon: {
+    display: "block",
+    color: theme.palette.primary.light,
+    margin: theme.spacing(1, "auto"),
+  }
 }));
 
 export default function App() {
@@ -174,6 +181,7 @@ export default function App() {
             color="textSecondary"
             component="p"
           >
+            <CodeTwoToneIcon className={classes.icon} />
             Developed with React & Express
           </Typography>
         </footer>

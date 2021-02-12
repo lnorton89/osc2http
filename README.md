@@ -1,34 +1,26 @@
-# Expack - Express and Webpack Boilerplate
+# OSC2HTTP
 
-Expack is the bare-bones Express and Webpack boilerplate with ES6+ babel transpilation, ESLint linting, Hot Module Reloading, and Jest test framework enabled.
+Express / React application to listen and convert OSC messages to interact with an HTTP/JSON API. It's currently only setup to output to my WLED controllers but could be modified easily to communicate with other APIs.
 
-Expack has two build modes: Development and Production.
-
-When you run `npm run buildDev`, Javascript, HTML, and CSS files are unminified and not uglified, meaning that you can easily inspect them in Chrome Dev Tools. Hot Module Reloading is enabled via `webpack-dev-middleware` and `webpack-hot-middleware`. 
-
-When you run `npm run buildProd`, Javascript, HTML, and CSS files are all minified and uglified, and images are encoded as Base64 directly into your CSS file, which results in less calls to the server for image files.
-
-## Google App Engine Flex Deployment
-
-Expack can be deployed directly to Google App Engine Flex with the command `npm run deploy`. **IMPORTANT:** Currently `app.yaml` is configured to use minimal resources to save on cost, which is great for development but terrible for production. Please review and update `app.yaml` to suit your own needs.
+All the data is stored in data.json in the root folder. If you would like to export/import data you can do so there. Currently the output sends a `POST` request to `http://IP.ADDRESS/json/state` with the item WLED preset. See [WLED Wiki](https://github.com/Aircoookie/WLED/wiki/JSON-API "WLED Wiki") for more information.
 
 ## Installation & Usage
 
-    git clone https://github.com/bengrunfeld/expack.git
-    cd expack
+    git clone https://github.com/lnorton89/osc2http.git
+    cd osc2http
     npm install
-    
-    npm run buildDev        // for development
-        // OR
-    npm run buildProd
-    
-    npm start               // navigate to localhost:8080 for local dev
+    npm run dev
 
-### For testing
+## Known Bugs
 
-    npm test                // runs test
-    npm run coverage        // generates a coverage report
+- `material-table` [has a bug](https://github.com/mbrn/material-table/issues/2404) where a React Hook triggers an infinite loop. Version locked at `1.69.1` to mitigate. Seems like `WONTFIX` at this point.
+- `material-table` [has a bug](https://github.com/mbrn/material-table/issues/2270) where pressing enter when editing a field bypasses validation. Seems like `WONTFIX` at this point.
 
-## Security
+## TODO
 
-Please ensure that your version of Node and NPM are up to date, and run `npm audit` after installation to ensure that no vulnerabilities exist. If they do, follow the audits instructions on how to resolve them. 
+- Add button to capture OSC messages to avoid typing them out.
+- Add more configuration for per-item output.
+
+### License
+
+Based off of [`expack`](https://github.com/bengrunfeld/expack). This project is licensed under the terms of the [MIT license](https://github.com/lnorton89/osc2http/blob/master/LICENSE).

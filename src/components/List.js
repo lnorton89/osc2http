@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { TextField, Checkbox, CircularProgress } from "@material-ui/core";
-import MaterialTable from "material-table";
 import {
   AddBox,
   ArrowDownward,
@@ -19,6 +18,7 @@ import {
   Remove,
   ViewColumn,
 } from "@material-ui/icons";
+import MaterialTable from "material-table";
 
 const tableIcons = {
   Add: React.forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -57,32 +57,11 @@ const tableIcons = {
 };
 
 const useStyles = makeStyles((theme) => ({
-  [theme.breakpoints.down("xs")]: {
-    "@global": {
-      ".MuiTableFooter-root": {
-        "& .MuiIconButton-root": {
-          padding: "5px",
-        },
-        "& .MuiInputBase-input": {
-          fontSize: ".65em",
-        },
-        "& .MuiTypography-root": {
-          fontSize: ".65em",
-        },
-      },
-      "#full-width-tabpanel-0": {},
-    },
-  },
-  table: {
-    [theme.breakpoints.down("md")]: {
-      padding: theme.spacing(0),
-      margin: theme.spacing(0),
-    },
+  table: {},
+  "& div": {
     "& div": {
-      "& div": {
-        "& table": {
-          // width: '50%'
-        },
+      "& table": {
+        // width: '50%'
       },
     },
   },
@@ -138,7 +117,13 @@ export default function List() {
   };
 
   const columns = [
-    { field: "id", title: "ID", editable: "never", width: "5%", defaultSort: "asc" },
+    {
+      field: "id",
+      title: "ID",
+      editable: "never",
+      width: "5%",
+      defaultSort: "asc",
+    },
     {
       field: "name",
       title: "Name",
